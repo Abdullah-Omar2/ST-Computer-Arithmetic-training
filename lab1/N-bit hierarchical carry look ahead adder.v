@@ -1,4 +1,4 @@
-module N_bit_hierarchical_Carry_look_ahead_adder #(parameter N = 64 )
+module N_bit_hierarchical_carry_look_ahead_adder #(parameter N = 64 )
   (
   input wire [N-1:0] a,b,  // 64-bit input operands a and b
   input wire cin,         // Carry-in input (initial carry value)
@@ -27,7 +27,7 @@ endmodule
 
 
 `timescale 1ns / 1ps
-module N_bit_hierarchical_Carry_look_ahead_adder_tb;
+module N_bit_hierarchical_carry_look_ahead_adder_tb;
 // Parameters
 parameter N = 64;
 // Inputs
@@ -38,7 +38,7 @@ reg cin;
 wire [N-1:0] sum;
 wire cout;
 // Instantiate the Unit Under Test (UUT)
-N_bit_hierarchical_Carry_look_ahead_adder #(N) uut (
+N_bit_hierarchical_carry_look_ahead_adder #(N) uut (
 .a(a),
 .b(b),
 .cin(cin),

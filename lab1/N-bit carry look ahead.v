@@ -13,7 +13,7 @@ module N_bit_carry_look_ahead #(parameter integer N = 64)(
   assign temp_generate[0] = g[0];
 
   generate
-    for (i = 1; i < N; i = i + 1) begin
+    for (i = 1; i < N; i = i + 1) begin : a
       assign temp_generate[i] = g[i] | (p[i] & temp_generate[i-1]);
     end
   endgenerate
@@ -22,7 +22,7 @@ module N_bit_carry_look_ahead #(parameter integer N = 64)(
   
   assign c[1] = g[0] | (p[0] & cin); 
   generate
-    for (i = 2; i < N+1; i = i + 1) begin
+    for (i = 2; i < N+1; i = i + 1) begin : b
       assign c[i] = g[i-1] | (p[i-1]&c[i-1]);
     end
   endgenerate
