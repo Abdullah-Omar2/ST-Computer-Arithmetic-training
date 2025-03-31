@@ -9,46 +9,44 @@ module Divider #(parameter N = 24)
     output reg             done       // Asserted for one clock cycle when division is complete
 );
 
-    // reg_div holds both the remainder (upper half) and dividend (lower half)
+    // Register to hold both remainder (upper half) and dividend (lower half)
     reg [2*N-1:0] reg_div;
-    // Counter to track iterations (needs to count up to N)
+    // Counter to track iterations (needs to count up to N for N-bit division)
     reg [$clog2(N+1)-1:0] count;
 
-    // Intermediate combinational signals
+    // Shifted register for the division algorithm
     wire [2*N-1:0] shifted;
-    assign shifted = reg_div << 1;
+    assign shifted = reg_div << 1; // Shift left to bring in the next bit
 
+    // Compute next value of reg_div based on comparison with divisor
     wire [2*N-1:0] calc_reg_div;
     assign calc_reg_div = (shifted[2*N-1:N] >= divisor) ?
-                          { shifted[2*N-1:N] - divisor, shifted[N-1:1], 1'b1 }:
-                          shifted;
+                          { shifted[2*N-1:N] - divisor, shifted[N-1:1], 1'b1 } : // Subtract divisor and set LSB to 1
+                          shifted; // Otherwise, just shift
 
     always @(posedge clk) begin
         if (rst) begin
-            // Load new dividend into lower half; upper half is zero.
+            // Reset state: Load dividend into lower half; upper half is zero.
             reg_div   <= { {N{1'b0}}, dividend };
-            count     <= N;
+            count     <= N; // Initialize counter to N
             done      <= 1'b0;
             quotient  <= {N{1'b0}};
             remainder <= {N{1'b0}};
         end else if (count != 0) begin
-            // Update state registers with nonblocking assignments.
+            // Perform one iteration of division per clock cycle
             reg_div   <= calc_reg_div;
             count     <= count - 1;
             if (count == 1) begin
+                // On final iteration, latch results
                 quotient  <= calc_reg_div[N-1:0];
                 remainder <= calc_reg_div[2*N-1:N];
-                done      <= 1'b1;  // Assert done for one clock cycle.
+                done      <= 1'b1; // Indicate completion
             end else begin
-                done      <= 1'b0;
+                done      <= 1'b0; // Keep done low otherwise
             end
         end
     end
-
 endmodule
-
-
-
 
 
 `timescale 1ns/1ps
@@ -78,18 +76,18 @@ module Divider_tb;
     // Clock generation: 10 ns period
     initial begin
         clk = 0;
-        forever #5 clk = ~clk;
+        forever #5 clk = ~clk; // Toggle clock every 5 ns
     end
 
-    // Test stimulus with multiple cases
+    // Test cases
     initial begin
         // Test case 1: Divide 100 by 3
-        dividend = 24'd100;
-        divisor  = 24'd3;
-        rst = 1; // assert reset to load new inputs
+        dividend = 24'b101110000000000000000000;
+        divisor  = 24'b101000000000000000000000;
+        rst = 1; // Assert reset to load new inputs
         #10;
-        rst = 0; // release reset
-        wait(done);
+        rst = 0; // Release reset
+        wait(done); // Wait for division to complete
         $display("Time: %0t | Test 1: Dividend = %d, Divisor = %d, Quotient = %d, Remainder = %d", 
                  $time, dividend, divisor, quotient, remainder);
         #20;
@@ -160,8 +158,6 @@ module Divider_tb;
                  $time, dividend, divisor, quotient, remainder);
         #20;
 
-        $stop;
+        $stop; // End simulation
     end
-
 endmodule
-
