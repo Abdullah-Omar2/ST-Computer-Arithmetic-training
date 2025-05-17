@@ -5,7 +5,7 @@ It includes implementations of advanced adders and multipliers, which are fundam
 in high-performance digital circuits.
 These implementations focus on optimizing speed, area, and power consumption for efficient arithmetic operations.
 
-![Certificate](Certificate.png)
+![Certificate](Certificate.jpg)
 
 ## Table of Contents
 
